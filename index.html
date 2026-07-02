@@ -632,10 +632,14 @@
             </div>
 
             <p class="section-label">Attendance</p>
-            <div class="field-row">
+            <div class="field-row three">
               <div class="field">
                 <label for="f-late">Minutes late</label>
                 <input id="f-late" type="number" min="0" step="1" value="0">
+              </div>
+              <div class="field">
+                <label for="f-undertime">Minutes undertime</label>
+                <input id="f-undertime" type="number" min="0" step="1" value="0">
               </div>
               <div class="field">
                 <label for="f-absent">Days absent</label>
@@ -953,6 +957,7 @@
     const gross = Number(inp.grossMonthly)||0;
     const workingDays = Number(inp.workingDays)||1;
     const minutesLate = Number(inp.minutesLate)||0;
+    const minutesUndertime = Number(inp.minutesUndertime)||0;
     const daysAbsent = Number(inp.daysAbsent)||0;
     const taxRate = Number(inp.taxRatePercent)||0;
     const allowances = Number(inp.allowances)||0;
@@ -961,9 +966,10 @@
     const dailyRate = gross / workingDays;
     const hourlyRate = dailyRate / 8;
     const lateDeduction = hourlyRate * (minutesLate/60);
+    const undertimeDeduction = hourlyRate * (minutesUndertime/60);
     const absentDeduction = dailyRate * daysAbsent;
-    const attendanceDeduction = lateDeduction + absentDeduction;
-    // Late/absent are deducted from the gross monthly rate first, then tax is
+    const attendanceDeduction = lateDeduction + undertimeDeduction + absentDeduction;
+    // Late/absent/undertime are deducted from the gross monthly rate first, then tax is
     // computed on that reduced amount. Allowances and other deductions are
     // applied after tax (allowances often untaxed; other deductions like
     // loans are typically post-tax withholdings).
@@ -972,7 +978,7 @@
     const totalDeductions = attendanceDeduction + otherDeductions;
     const netPay = adjustedGross - tax + allowances - otherDeductions;
 
-    return { dailyRate, hourlyRate, lateDeduction, absentDeduction, attendanceDeduction,
+    return { dailyRate, hourlyRate, lateDeduction, undertimeDeduction, absentDeduction, attendanceDeduction,
              adjustedGross, tax, totalDeductions, netPay };
   }
   function esc(s){
@@ -1009,6 +1015,7 @@
       grossMonthly: document.getElementById("f-gross").value,
       workingDays: document.getElementById("f-workdays").value,
       minutesLate: document.getElementById("f-late").value,
+      minutesUndertime: document.getElementById("f-undertime").value,
       daysAbsent: document.getElementById("f-absent").value,
       allowances: document.getElementById("f-allowance").value,
       otherDeductions: document.getElementById("f-otherded").value,
@@ -1041,6 +1048,7 @@
 
         <div class="stub-section-title">Attendance deductions (from gross)</div>
         <div class="stub-row"><span class="k">Late (${esc(d.minutesLate||0)} min)</span><span class="v neg">−${fmt(c.lateDeduction)}</span></div>
+        <div class="stub-row"><span class="k">Undertime (${esc(d.minutesUndertime||0)} min)</span><span class="v neg">−${fmt(c.undertimeDeduction)}</span></div>
         <div class="stub-row"><span class="k">Absent (${esc(d.daysAbsent||0)} days)</span><span class="v neg">−${fmt(c.absentDeduction)}</span></div>
         <div class="stub-row"><span class="k">Adjusted gross (taxable)</span><span class="v">${fmt(c.adjustedGross)}</span></div>
         <div class="stub-row"><span class="k">Tax (${esc(d.taxRatePercent||0)}%)</span><span class="v neg">−${fmt(c.tax)}</span></div>
@@ -1060,7 +1068,7 @@
     `;
   }
 
-  ["f-period","f-workdays","f-late","f-absent","f-allowance","f-otherded","f-tax"]
+  ["f-period","f-workdays","f-late","f-undertime","f-absent","f-allowance","f-otherded","f-tax"]
     .forEach(id => document.getElementById(id).addEventListener("input", renderStub));
 
   function populateEmployeeDropdown(){
@@ -1298,6 +1306,7 @@
     line(leftX, ly, "Hourly rate", pdfFmt(record.computed.hourlyRate)); ly += 16;
 
     line(rightX, ry, `Late (${record.minutesLate} min)`, "-"+pdfFmt(record.computed.lateDeduction)); ry += 16;
+    line(rightX, ry, `Undertime (${record.minutesUndertime} min)`, "-"+pdfFmt(record.computed.undertimeDeduction)); ry += 16;
     line(rightX, ry, `Absent (${record.daysAbsent} days)`, "-"+pdfFmt(record.computed.absentDeduction)); ry += 16;
 
     y = Math.max(ly, ry) + 10;
