@@ -1305,9 +1305,9 @@
     line(leftX, ly, "Daily rate", pdfFmt(record.computed.dailyRate)); ly += 16;
     line(leftX, ly, "Hourly rate", pdfFmt(record.computed.hourlyRate)); ly += 16;
 
-    line(rightX, ry, `Late (${record.minutesLate} min)`, "-"+pdfFmt(record.computed.lateDeduction)); ry += 16;
-    line(rightX, ry, `Undertime (${record.minutesUndertime} min)`, "-"+pdfFmt(record.computed.undertimeDeduction)); ry += 16;
-    line(rightX, ry, `Absent (${record.daysAbsent} days)`, "-"+pdfFmt(record.computed.absentDeduction)); ry += 16;
+    line(rightX, ry, `Late (${record.minutesLate || 0} min)`, "-"+pdfFmt(record.computed.lateDeduction)); ry += 16;
+    line(rightX, ry, `Undertime (${record.minutesUndertime || 0} min)`, "-"+pdfFmt(record.computed.undertimeDeduction)); ry += 16;
+    line(rightX, ry, `Absent (${record.daysAbsent || 0} days)`, "-"+pdfFmt(record.computed.absentDeduction)); ry += 16;
 
     y = Math.max(ly, ry) + 10;
     doc.setDrawColor(220,211,184);
