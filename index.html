@@ -1373,6 +1373,7 @@
       grossMonthly: Number(d.grossMonthly),
       workingDays: Number(d.workingDays),
       minutesLate: Number(d.minutesLate)||0,
+      minutesUndertime: Number(d.minutesUndertime)||0,
       daysAbsent: Number(d.daysAbsent)||0,
       allowances: Number(d.allowances)||0,
       otherDeductions: Number(d.otherDeductions)||0,
@@ -1405,7 +1406,7 @@
     const record = {
       employeeName: d.name, employeeEmail: d.email, position: d.position, period: d.period,
       grossMonthly: Number(d.grossMonthly), workingDays: Number(d.workingDays),
-      minutesLate: Number(d.minutesLate)||0, daysAbsent: Number(d.daysAbsent)||0,
+      minutesLate: Number(d.minutesLate)||0, minutesUndertime: Number(d.minutesUndertime)||0, daysAbsent: Number(d.daysAbsent)||0,
       allowances: Number(d.allowances)||0, otherDeductions: Number(d.otherDeductions)||0,
       taxRatePercent: Number(d.taxRatePercent)||0, computed, createdAt: Date.now()
     };
