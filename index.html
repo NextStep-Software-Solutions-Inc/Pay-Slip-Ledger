@@ -463,6 +463,42 @@
     line-height:1.55;
     margin-bottom:16px;
   }
+
+  .dashboard-content { display: block; padding: 24px 0 0; }
+  .view-content { padding: 24px 40px 0; margin: 0 -40px; }
+  .view-content.bottom-pad { padding-bottom: 60px; }
+
+  @media (max-width:768px){
+    .app { flex-direction: column; }
+    .sidebar { 
+      width: 100%; height: auto; position: fixed; bottom: 0; top: auto; 
+      flex: none; z-index: 100; padding: 10px; flex-direction: row; 
+      align-items: center; border-top: 1px solid rgba(255,255,255,0.08); 
+    }
+    .brand { display: none; }
+    .nav { flex-direction: row; width: 100%; justify-content: space-around; padding: 0; }
+    .nav-item { flex-direction: column; gap: 4px; padding: 8px 12px; font-size: 11px; align-items: center; border-radius: 8px; }
+    .nav-item .num { display: none; }
+    .sidebar-foot { display: none; }
+    
+    .main { padding-bottom: 70px; }
+    .view { padding: 20px !important; }
+    .topbar { padding: 0; }
+    
+    .view-content { padding: 20px 0 0; margin: 0; }
+    .dashboard-content { padding: 20px 0 0; }
+    
+    .new-grid { gap: 16px; }
+    .stat-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+    .card { padding: 16px; }
+  }
+  @media (max-width:480px){
+    .stat-grid { grid-template-columns: 1fr; }
+    .nav-item { padding: 8px 4px; font-size: 10px; }
+    .topbar h2 { font-size: 24px; }
+    .stub-total { flex-direction: column; gap: 8px; align-items: flex-start; }
+    table { display: block; overflow-x: auto; white-space: nowrap; }
+  }
 </style>
 </head>
 <body>
@@ -493,7 +529,7 @@
         <h2>Dashboard</h2>
         <p class="sub">A quick look at payroll activity on this device.</p>
       </div>
-      <div class="view" style="display:block;padding:24px 0 0;">
+      <div class="dashboard-content">
         <div class="stat-grid" id="stat-grid"></div>
         <div class="card">
           <div class="row between" style="margin-bottom:14px;">
@@ -512,7 +548,7 @@
         <h2>Employees</h2>
         <p class="sub">Register each employee once — their details and rate will pre-fill every new payslip.</p>
       </div>
-      <div style="padding:24px 40px 0;margin:0 -40px;">
+      <div class="view-content">
         <div class="new-grid">
           <form class="card" id="employee-form">
             <p class="section-label" id="employee-form-label">Add employee</p>
@@ -565,7 +601,7 @@
         <h2>New Payslip</h2>
         <p class="sub">Fill in the details on the left — the stub updates as you type.</p>
       </div>
-      <div style="padding:24px 40px 0;margin:0 -40px;">
+      <div class="view-content">
         <div class="new-grid">
           <form class="card" id="payslip-form">
             <p class="section-label">Employee</p>
@@ -647,7 +683,7 @@
         <h2>Payslip History</h2>
         <p class="sub">Everything generated on this device, stored in IndexedDB.</p>
       </div>
-      <div style="padding:24px 40px 0;margin:0 -40px;">
+      <div class="view-content">
         <div class="card">
           <div class="row between" style="margin-bottom:16px;">
             <input id="search-input" placeholder="Search by name, email, or period…" style="flex:1;max-width:340px;border:1px solid var(--line);padding:9px 12px;border-radius:4px;font-size:13.5px;outline:none;">
@@ -685,7 +721,7 @@
         <h2>Settings</h2>
         <p class="sub">Defaults, company details, and email delivery.</p>
       </div>
-      <div style="padding:24px 40px 60px;margin:0 -40px;">
+      <div class="view-content bottom-pad">
         <div class="settings-grid">
           <div class="card">
             <p class="section-label">Payroll defaults</p>
