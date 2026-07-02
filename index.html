@@ -817,6 +817,19 @@
   </div>
 </div>
 
+<div class="modal-bg" id="view-modal-bg">
+  <div class="modal" style="max-width:540px; padding:26px;">
+    <h3 style="margin:0 0 16px;">View Payslip</h3>
+    <div class="stub-wrap" style="position:static; max-height:60vh; overflow-y:auto; margin:0 -26px 20px; padding:0 26px;">
+      <div class="stub" id="view-stub"></div>
+    </div>
+    <div class="row">
+      <button class="btn secondary" id="btn-close-view">Close</button>
+      <button class="btn" id="btn-download-view">Download PDF</button>
+    </div>
+  </div>
+</div>
+
 <script>
 (function(){
   "use strict";
@@ -1023,12 +1036,9 @@
     };
   }
 
-  function renderStub(){
-    const d = currentFormData();
-    const c = computePayslip(d);
+  function generateStubHTML(d, c, genDate = null) {
     const co = settings.company || {};
-    const stub = document.getElementById("stub");
-    stub.innerHTML = `
+    return `
       <div class="stub-head">
         <div>
           <div class="co-name">${esc(co.name || "Your Company Inc.")}</div>
@@ -1062,10 +1072,16 @@
         <span class="v">${fmt(c.netPay)}</span>
       </div>
       <div class="stub-perf">
-        <span>Generated ${todayLabel()}</span>
+        <span>Generated ${genDate ? new Date(genDate).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"}) : todayLabel()}</span>
         <span>Payslip Ledger</span>
       </div>
     `;
+  }
+
+  function renderStub(){
+    const d = currentFormData();
+    const c = computePayslip(d);
+    document.getElementById("stub").innerHTML = generateStubHTML(d, c);
   }
 
   ["f-period","f-workdays","f-late","f-undertime","f-absent","f-allowance","f-otherded","f-tax"]
@@ -1479,6 +1495,7 @@
         <td>${new Date(p.createdAt).toLocaleDateString()}</td>
         <td>
           <div class="row" style="gap:6px;flex-wrap:nowrap;">
+            <button class="btn ghost small" data-action="view" data-id="${p.id}">View</button>
             <button class="btn ghost small" data-action="download" data-id="${p.id}">PDF</button>
             <button class="btn ghost small" data-action="email" data-id="${p.id}">Email</button>
             <button class="btn ghost small" data-action="delete" data-id="${p.id}" style="color:var(--brick);">Delete</button>
@@ -1497,7 +1514,26 @@
     const record = payslips.find(p=>p.id===id);
     if(!record) return;
     const action = btn.dataset.action;
-    if(action==="download"){
+    if(action==="view"){
+      const d = {
+        name: record.employeeName,
+        email: record.employeeEmail,
+        position: record.position,
+        period: record.period,
+        grossMonthly: record.grossMonthly,
+        workingDays: record.workingDays,
+        minutesLate: record.minutesLate || 0,
+        minutesUndertime: record.minutesUndertime !== undefined ? record.minutesUndertime : (record.computed.undertimeDeduction ? Math.round((record.computed.undertimeDeduction / record.computed.hourlyRate) * 60) : 0),
+        daysAbsent: record.daysAbsent || 0,
+        allowances: record.allowances || 0,
+        otherDeductions: record.otherDeductions || 0,
+        taxRatePercent: record.taxRatePercent || 0
+      };
+      const c = record.computed;
+      document.getElementById("view-stub").innerHTML = generateStubHTML(d, c, record.createdAt);
+      document.getElementById("btn-download-view").dataset.id = record.id;
+      document.getElementById("view-modal-bg").classList.add("show");
+    } else if(action==="download"){
       downloadPDF(record);
     } else if(action==="email"){
       openEmailFlow(record);
@@ -1560,6 +1596,12 @@
     document.getElementById("modal-bg").classList.add("show");
   }
   document.getElementById("modal-cancel").addEventListener("click", ()=> document.getElementById("modal-bg").classList.remove("show"));
+  document.getElementById("btn-close-view").addEventListener("click", ()=> document.getElementById("view-modal-bg").classList.remove("show"));
+  document.getElementById("btn-download-view").addEventListener("click", (e)=> {
+    const id = Number(e.target.dataset.id);
+    const record = payslips.find(p=>p.id===id);
+    if(record) downloadPDF(record);
+  });
   document.getElementById("modal-confirm").addEventListener("click", async ()=>{
     document.getElementById("modal-bg").classList.remove("show");
     if(modalConfirmCb) await modalConfirmCb();
